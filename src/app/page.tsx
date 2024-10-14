@@ -1,13 +1,8 @@
-import {redirect, RedirectType} from "next/navigation";
+import {redirect, RedirectType} from 'next/navigation';
 
-type Props = {
-
-};
+type Props = {};
 const Page = ({}: Props) => {
-
-    return (
-        redirect("/dashboard", RedirectType.replace)
-    );
+  return redirect('/dashboard', RedirectType.replace);
 };
 
-export default Page
+export default Page;

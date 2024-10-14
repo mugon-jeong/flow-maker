@@ -1,14 +1,8 @@
 import React from 'react';
 
-type Props = {
-
-};
+type Props = {};
 const Page = ({}: Props) => {
-    return (
-        <div>
-            make
-        </div>
-    );
+  return <div>make</div>;
 };
 
-export default Page
+export default Page;
