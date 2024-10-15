@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import {ThemeProvider} from '@/providers/theme-provider';
+import {ProfileProvider} from '@/providers/profile-provider';
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -30,7 +31,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ProfileProvider>{children}</ProfileProvider>
         </ThemeProvider>
       </body>
     </html>
