@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import {supabaseClient} from '@/lib/supabase-client';
+import {User} from '@supabase/supabase-js';
 
 interface ProfileContextProps {
   fullname: string | null;
@@ -35,29 +36,14 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
   const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
-  async function downloadImage(path: string) {
-    try {
-      const {data, error} = await supabase.storage
-        .from('avatars')
-        .download(path);
-      if (error) {
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      setAvatarUrl(url);
-    } catch (error) {
-      console.log('Error downloading image: ', error);
-    }
-  }
-
   const getProfile = useCallback(async () => {
-    const user = await supabase.auth.getUser();
-
+    const {
+      data: {user},
+    } = await supabase.auth.getUser();
     const {data, error, status} = await supabase
       .from('profiles')
       .select(`full_name, username, website, avatar_url`)
-      .eq('id', user.data.user?.id)
+      .eq('id', user?.id)
       .single();
 
     if (error && status !== 406) {
@@ -69,9 +55,7 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
       setFullname(data.full_name);
       setUsername(data.username);
       setWebsite(data.website);
-      if (data.avatar_url) {
-        await downloadImage(data.avatar_url);
-      }
+      setAvatarUrl(data.avatar_url);
     }
   }, [supabase]);
 

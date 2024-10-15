@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import MobileSidebar from '@/components/sidebar/mobile-sidebar';
 import {
   Breadcrumb,
@@ -24,19 +24,26 @@ import {Button} from '@/components/ui/button';
 import Image from 'next/image';
 import {usePathname, useRouter} from 'next/navigation';
 import {useProfileContext} from '@/providers/profile-provider';
-import {supabaseClient} from '@/lib/supabase-client';
+import {downloadImage} from '@/lib/utils';
 
 type Props = {};
 const HeaderBar = ({}: Props) => {
   const {avatar_url} = useProfileContext();
-  const supabase = supabaseClient();
+  const [avatar, setAvatar] = useState<string>();
   const router = useRouter();
   const pathname = usePathname();
   const pathnames = pathname
     .split('/')
     .filter(value => value.length > 0)
     .map(value => value.concat()[0].toUpperCase() + value.slice(1));
-
+  useEffect(() => {
+    if (avatar_url) {
+      console.log('avatar_url', avatar_url);
+      downloadImage(avatar_url).then(data => {
+        setAvatar(data);
+      });
+    }
+  }, [avatar_url]);
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <MobileSidebar />
@@ -79,19 +86,23 @@ const HeaderBar = ({}: Props) => {
             size="icon"
             className="overflow-hidden rounded-full"
           >
-            <Image
-              alt=""
-              src={avatar_url ?? ''}
-              width={36}
-              height={36}
-              className="overflow-hidden rounded-full"
-            />
+            {avatar && (
+              <Image
+                alt=""
+                src={avatar}
+                width={36}
+                height={36}
+                className="overflow-hidden rounded-full"
+              />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>
+            <button onClick={() => router.push('/account')}>Settings</button>
+          </DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>

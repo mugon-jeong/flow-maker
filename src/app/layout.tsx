@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import {ThemeProvider} from '@/providers/theme-provider';
 import {ProfileProvider} from '@/providers/profile-provider';
+import {Toaster} from '@/components/ui/toaster';
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -31,7 +32,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ProfileProvider>{children}</ProfileProvider>
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
