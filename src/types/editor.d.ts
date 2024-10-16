@@ -1,5 +1,3 @@
-import {NodeTypes} from '@xyflow/react';
-
 export type FlowTypes = 'Start' | 'Condition' | 'Trigger' | 'Action' | 'End';
 
 export type FlowCardType = {

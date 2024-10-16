@@ -7,9 +7,10 @@ import {
 } from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {clsx} from 'clsx';
-import {useNodeId} from '@xyflow/react';
+import {Position, useNodeId} from '@xyflow/react';
 import {useEditor} from '@/providers/editor-provider';
 import {FlowCardType} from '@/types/editor';
+import CustomHandle from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/custom-handle';
 
 type Props = {
   data: FlowCardType;
@@ -19,6 +20,13 @@ const FlowCard = ({data}: Props) => {
   const nodeId = useNodeId();
   return (
     <>
+      {data.type != 'Start' && (
+        <CustomHandle
+          type="target"
+          position={Position.Top}
+          style={{zIndex: 100}}
+        />
+      )}
       <Card
         onClick={e => {
           e.stopPropagation();
@@ -57,6 +65,9 @@ const FlowCard = ({data}: Props) => {
           })}
         ></div>
       </Card>
+      {data.type !== 'End' && (
+        <CustomHandle type="source" position={Position.Bottom} id="a" />
+      )}
     </>
   );
 };

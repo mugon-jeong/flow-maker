@@ -60,6 +60,7 @@ const Page = ({}: Props) => {
       if (typeof type === 'undefined' || !type) {
         return;
       }
+
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
