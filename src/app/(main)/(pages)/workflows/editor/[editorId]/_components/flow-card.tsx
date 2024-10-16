@@ -8,15 +8,28 @@ import {
 import {Badge} from '@/components/ui/badge';
 import {clsx} from 'clsx';
 import {useNodeId} from '@xyflow/react';
+import {useEditor} from '@/providers/editor-provider';
+import {FlowCardType} from '@/types/editor';
 
-type Props = {};
-const FlowCard = ({}: Props) => {
+type Props = {
+  data: FlowCardType;
+};
+const FlowCard = ({data}: Props) => {
+  const {dispatch, state} = useEditor();
   const nodeId = useNodeId();
   return (
     <>
       <Card
         onClick={e => {
           e.stopPropagation();
+          const val = state.editor.elements.find(n => n.id === nodeId);
+          if (val)
+            dispatch({
+              type: 'SELECTED_ELEMENT',
+              payload: {
+                element: val,
+              },
+            });
         }}
         className="relative max-w-[400px] dark:border-muted-foreground/70"
       >

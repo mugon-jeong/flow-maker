@@ -1,9 +1,11 @@
 'use client';
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   addEdge,
   Background,
+  Connection,
   Controls,
+  Edge,
   MiniMap,
   ReactFlow,
   useEdgesState,
@@ -19,67 +21,105 @@ import {
 import CircleProgress from '@/components/global/circle-progress';
 import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-card';
 import EditorSidebar from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/editor-sidebar';
+import {useEditor} from '@/providers/editor-provider';
+import {usePathname} from 'next/navigation';
+import {FlowCardType} from '@/types/editor';
+import {v4} from 'uuid';
+import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 
 type Props = {};
-let id = 0;
-const getId = () => `dndnode_${id++}`;
 const Page = ({}: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
+  const {dispatch, state} = useEditor();
+  const pathname = usePathname();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {screenToFlowPosition} = useReactFlow();
-  // const [type] = useEditor();
-  const onConnect = useCallback(
-    params => setEdges(eds => addEdge(params, eds)),
-    [],
-  );
-  const onDragOver = useCallback(event => {
+
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
+  const onConnect = useCallback(
+    (params: Edge | Connection) =>
+      // @ts-ignore
+      setEdges(eds => addEdge(params, eds)),
+    [],
+  );
+
   const onDrop = useCallback(
-    event => {
+    (event: any) => {
       event.preventDefault();
 
-      // check if the dropped element is valid
-      // if (!type) {
-      //   return;
-      // }
+      const type: FlowCardType['type'] = event.dataTransfer.getData(
+        'application/reactflow',
+      );
 
+      // check if the dropped element is valid
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
       const newNode = {
-        id: getId(),
-        type: 'type',
+        id: v4(),
+        type: type,
         position,
-        data: {label: `type node`},
+        data: {
+          title: type,
+          description: EditorCanvasDefaultCardTypes[type].description,
+          completed: false,
+          current: false,
+          metadata: {},
+          type: type,
+        },
       };
 
+      // @ts-ignore
       setNodes(nds => nds.concat(newNode));
     },
-    [screenToFlowPosition],
+    [screenToFlowPosition, state],
   );
 
   const nodeTypes = useMemo(
     () => ({
+      Start: FlowCard,
       Action: FlowCard,
       Trigger: FlowCard,
-      Email: FlowCard,
       Condition: FlowCard,
-      AI: FlowCard,
-      Slack: FlowCard,
-      'Google Drive': FlowCard,
-      Notion: FlowCard,
-      Discord: FlowCard,
-      'Custom Webhook': FlowCard,
-      'Google Calendar': FlowCard,
-      Wait: FlowCard,
+      End: FlowCard,
     }),
     [],
   );
+
+  const handleClickCanvas = () => {
+    dispatch({
+      type: 'SELECTED_ELEMENT',
+      payload: {
+        element: {
+          data: {
+            completed: false,
+            current: false,
+            description: '',
+            metadata: {},
+            title: '',
+            type: 'Trigger',
+          },
+          id: '',
+          position: {x: 0, y: 0},
+          type: 'Trigger',
+        },
+      },
+    });
+  };
+
+  useEffect(() => {
+    dispatch({type: 'LOAD_DATA', payload: {edges, elements: nodes}});
+  }, [nodes, edges]);
+
   return (
     <ResizablePanelGroup direction={'horizontal'}>
       <ResizablePanel defaultSize={70}>
@@ -88,13 +128,15 @@ const Page = ({}: Props) => {
             <CircleProgress />
           ) : (
             <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
               onDrop={onDrop}
               onDragOver={onDragOver}
+              nodes={nodes}
+              onNodesChange={onNodesChange}
+              edges={edges}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              fitView
+              onClick={handleClickCanvas}
               nodeTypes={nodeTypes}
             >
               <Background />
