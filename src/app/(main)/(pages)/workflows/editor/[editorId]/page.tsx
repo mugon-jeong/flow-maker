@@ -26,6 +26,7 @@ import {usePathname} from 'next/navigation';
 import {FlowCardType} from '@/types/editor';
 import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
+import FlowInstance from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-instance';
 
 type Props = {};
 const Page = ({}: Props) => {
@@ -158,7 +159,9 @@ const Page = ({}: Props) => {
           <CircleProgress />
         ) : (
           <>
-            <EditorSidebar nodes={nodes} />
+            <FlowInstance edges={edges} nodes={nodes}>
+              <EditorSidebar nodes={nodes} />
+            </FlowInstance>
           </>
         )}
       </ResizablePanel>
