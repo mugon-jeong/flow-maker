@@ -7,19 +7,28 @@ import {
 } from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {clsx} from 'clsx';
-import {Position, useNodeId} from '@xyflow/react';
+import {NodeResizer, Position, useNodeId} from '@xyflow/react';
 import {useEditor} from '@/providers/editor-provider';
 import {FlowCardType} from '@/types/editor';
 import CustomHandle from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/custom-handle';
 
 type Props = {
   data: FlowCardType;
+  selected: boolean;
 };
-const FlowCard = ({data}: Props) => {
+const FlowCard = ({data, selected}: Props) => {
   const {dispatch, state} = useEditor();
   const nodeId = useNodeId();
+  console.log('FlowCard', nodeId);
+  console.log('selected', selected);
   return (
     <>
+      <NodeResizer
+        color="#ff0071"
+        isVisible={selected}
+        minWidth={100}
+        minHeight={30}
+      />
       {data.type != 'Start' && (
         <CustomHandle
           type="target"
@@ -39,7 +48,7 @@ const FlowCard = ({data}: Props) => {
               },
             });
         }}
-        className="relative max-w-[400px] dark:border-muted-foreground/70"
+        className="relative dark:border-muted-foreground/70 w-full h-full"
       >
         <CardHeader className="flex flex-row items-center gap-4">
           <div>logo</div>

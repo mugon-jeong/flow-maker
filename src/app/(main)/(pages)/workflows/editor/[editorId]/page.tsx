@@ -28,6 +28,7 @@ import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 import FlowInstance from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-instance';
 import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
+import FlowDownloadButton from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-download-button';
 
 type Props = {};
 const initialNodes: FlowNodeType[] = [];
@@ -170,6 +171,7 @@ const Page = ({}: Props) => {
                 zoomable
                 pannable
               />
+              <FlowDownloadButton />
             </ReactFlow>
           )}
         </div>
