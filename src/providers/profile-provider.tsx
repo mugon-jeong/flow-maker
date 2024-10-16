@@ -9,13 +9,25 @@ import {
   useState,
 } from 'react';
 import {supabaseClient} from '@/lib/supabase-client';
-import {User} from '@supabase/supabase-js';
+import {useAuthContext} from '@/providers/auth-provider';
+import {useToast} from '@/hooks/use-toast';
 
 interface ProfileContextProps {
   fullname: string | null;
   username: string | null;
   website: string | null;
   avatar_url: string | null;
+  loading: boolean;
+  updateProfile: ({
+    username,
+    website,
+    avatar_url,
+  }: {
+    username: string | null;
+    fullname: string | null;
+    website: string | null;
+    avatar_url: string | null;
+  }) => Promise<void>;
 }
 
 interface ProfileProviderProps {
@@ -27,19 +39,54 @@ const ProfileContext = createContext<ProfileContextProps>({
   username: null,
   website: null,
   avatar_url: null,
+  loading: true,
+  updateProfile: async () => {},
 });
 
 export const ProfileProvider = ({children}: ProfileProviderProps) => {
   const supabase = supabaseClient();
+  const {user} = useAuthContext();
+  const {toast} = useToast();
   const [fullname, setFullname] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const updateProfile = useCallback(
+    async ({
+      username,
+      website,
+      avatar_url,
+    }: {
+      username: string | null;
+      fullname: string | null;
+      website: string | null;
+      avatar_url: string | null;
+    }) => {
+      try {
+        setLoading(true);
+        const {error} = await supabase.from('profiles').upsert({
+          id: user?.id as string,
+          full_name: fullname,
+          username,
+          website,
+          avatar_url,
+          updated_at: new Date().toISOString(),
+        });
+        if (error) throw error;
+        toast({title: 'Profile updated!'});
+        getProfile();
+        setLoading(false);
+      } catch (error) {
+        toast({variant: 'destructive', title: 'Error updating the data!'});
+      }
+    },
+    [fullname, supabase, toast, user],
+  );
 
   const getProfile = useCallback(async () => {
-    const {
-      data: {user},
-    } = await supabase.auth.getUser();
+    setLoading(true);
     const {data, error, status} = await supabase
       .from('profiles')
       .select(`full_name, username, website, avatar_url`)
@@ -47,8 +94,11 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
       .single();
 
     if (error && status !== 406) {
-      console.log(error);
-      throw error;
+      toast({
+        variant: 'destructive',
+        title: 'Error updating the data!',
+        description: error.message,
+      });
     }
 
     if (data) {
@@ -57,28 +107,12 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
       setWebsite(data.website);
       setAvatarUrl(data.avatar_url);
     }
-  }, [supabase]);
+    setLoading(false);
+  }, [supabase, toast, user]);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((auth, session) => {
-      switch (auth) {
-        case 'SIGNED_IN':
-          getProfile();
-          break;
-        case 'SIGNED_OUT':
-          setFullname(null);
-          setUsername(null);
-          setWebsite(null);
-          setAvatarUrl(null);
-          break;
-        case 'USER_UPDATED':
-          getProfile();
-          break;
-        default:
-          break;
-      }
-    });
-  }, [supabase, getProfile]);
+    if (user) getProfile();
+  }, [getProfile, user]);
   return (
     <ProfileContext.Provider
       value={useMemo(
@@ -87,8 +121,10 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
           username,
           website,
           avatar_url,
+          updateProfile,
+          loading,
         }),
-        [avatar_url, fullname, username, website],
+        [avatar_url, fullname, loading, updateProfile, username, website],
       )}
     >
       {children}
