@@ -1,5 +1,5 @@
 'use client';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
   addEdge,
   Background,
@@ -17,8 +17,8 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import CircleProgress from '@/components/global/circle-progress';
-import NodeItem from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/node-item';
-import {useEditor} from '@/providers/editor-provider';
+import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-card';
+import EditorSidebar from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/editor-sidebar';
 
 type Props = {};
 let id = 0;
@@ -28,7 +28,7 @@ const Page = ({}: Props) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {screenToFlowPosition} = useReactFlow();
-  const [type] = useEditor();
+  // const [type] = useEditor();
   const onConnect = useCallback(
     params => setEdges(eds => addEdge(params, eds)),
     [],
@@ -43,9 +43,9 @@ const Page = ({}: Props) => {
       event.preventDefault();
 
       // check if the dropped element is valid
-      if (!type) {
-        return;
-      }
+      // if (!type) {
+      //   return;
+      // }
 
       const position = screenToFlowPosition({
         x: event.clientX,
@@ -53,14 +53,32 @@ const Page = ({}: Props) => {
       });
       const newNode = {
         id: getId(),
-        type,
+        type: 'type',
         position,
-        data: {label: `${type} node`},
+        data: {label: `type node`},
       };
 
       setNodes(nds => nds.concat(newNode));
     },
-    [screenToFlowPosition, type],
+    [screenToFlowPosition],
+  );
+
+  const nodeTypes = useMemo(
+    () => ({
+      Action: FlowCard,
+      Trigger: FlowCard,
+      Email: FlowCard,
+      Condition: FlowCard,
+      AI: FlowCard,
+      Slack: FlowCard,
+      'Google Drive': FlowCard,
+      Notion: FlowCard,
+      Discord: FlowCard,
+      'Custom Webhook': FlowCard,
+      'Google Calendar': FlowCard,
+      Wait: FlowCard,
+    }),
+    [],
   );
   return (
     <ResizablePanelGroup direction={'horizontal'}>
@@ -77,6 +95,7 @@ const Page = ({}: Props) => {
               onConnect={onConnect}
               onDrop={onDrop}
               onDragOver={onDragOver}
+              nodeTypes={nodeTypes}
             >
               <Background />
               <Controls position={'top-left'} className={'text-black'} />
@@ -96,7 +115,7 @@ const Page = ({}: Props) => {
           <CircleProgress />
         ) : (
           <>
-            <NodeItem />
+            <EditorSidebar nodes={nodes} />
           </>
         )}
       </ResizablePanel>

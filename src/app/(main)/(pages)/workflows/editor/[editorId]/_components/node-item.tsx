@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import {useEditor} from '@/providers/editor-provider';
+import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-card';
 
 type Props = {};
 const NodeItem = ({}: Props) => {
@@ -32,6 +33,7 @@ const NodeItem = ({}: Props) => {
       >
         Output Node
       </div>
+      <FlowCard />
     </div>
   );
 };
