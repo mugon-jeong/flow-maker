@@ -4,16 +4,17 @@ import {usePathname} from 'next/navigation';
 import {Button} from '@/components/ui/button';
 import {onCreateNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
 import {useToast} from '@/hooks/use-toast';
+import {FlowNodeType} from '@/types/editor';
 
 type Props = {
   children: React.ReactNode;
-  edges: any[];
-  nodes: any[];
+  edges: {id: string; source: string; target: string}[];
+  nodes: FlowNodeType[];
 };
 const FlowInstance = ({children, edges, nodes}: Props) => {
   const {toast} = useToast();
   const pathname = usePathname();
-  const [isFlow, setIsFlow] = useState([]);
+  const [isFlow, setIsFlow] = useState<string[]>([]);
   const onFlowCreate = useCallback(async () => {
     console.log('pathname', pathname.split('/').pop()!);
     const {status} = await onCreateNodesEdges({
@@ -30,10 +31,10 @@ const FlowInstance = ({children, edges, nodes}: Props) => {
   }, [isFlow, nodes, edges, pathname, toast]);
 
   const onAutomateFlow = async () => {
-    const flows: any = [];
-    const connectedEdges = edges.map(edge => edge.target);
-    connectedEdges.map(target => {
-      nodes.map(node => {
+    const flows: string[] = [];
+    const connectedEdges = edges?.map(edge => edge.target);
+    connectedEdges?.map(target => {
+      nodes?.map(node => {
         if (node.id === target) {
           flows.push(node.type);
         }

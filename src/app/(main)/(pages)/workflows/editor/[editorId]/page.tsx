@@ -23,18 +23,22 @@ import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_componen
 import EditorSidebar from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/editor-sidebar';
 import {useEditor} from '@/providers/editor-provider';
 import {usePathname} from 'next/navigation';
-import {FlowCardType} from '@/types/editor';
+import {FlowCardType, FlowNodeType} from '@/types/editor';
 import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 import FlowInstance from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-instance';
+import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
 
 type Props = {};
+const initialNodes: FlowNodeType[] = [];
+
+const initialEdges: {id: string; source: string; target: string}[] = [];
 const Page = ({}: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const {dispatch, state} = useEditor();
   const pathname = usePathname();
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const {screenToFlowPosition} = useReactFlow();
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -85,6 +89,23 @@ const Page = ({}: Props) => {
     },
     [screenToFlowPosition, state],
   );
+
+  const onGetWorkFlow = async () => {
+    setIsLoading(true);
+    const {data, status} = await onGetNodesEdges(pathname.split('/').pop()!);
+    if (status == 200 && data) {
+      if (data[0].edges && data[0].nodes) {
+        setEdges(JSON.parse(data[0].edges!));
+        setNodes(JSON.parse(data[0].nodes!));
+        setIsLoading(false);
+      }
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    onGetWorkFlow();
+  }, []);
 
   const nodeTypes = useMemo(
     () => ({

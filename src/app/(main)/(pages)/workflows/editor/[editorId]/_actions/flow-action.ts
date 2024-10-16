@@ -24,3 +24,12 @@ export const onCreateNodesEdges = async ({
     .eq('id', flowId);
   return {status};
 };
+
+export const onGetNodesEdges = async (flowId: string) => {
+  const supabase = supabaseServer();
+  const {data, status} = await supabase
+    .from('workflows')
+    .select('*')
+    .eq('id', flowId);
+  return {data, status};
+};
