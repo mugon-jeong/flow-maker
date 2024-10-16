@@ -1,11 +1,12 @@
 import {createServerClient} from '@supabase/ssr';
 import {cookies} from 'next/headers';
 import {NextRequest, NextResponse} from 'next/server';
+import {Database} from '@/lib/supabase';
 
 export function supabaseServer() {
   const cookieStore = cookies();
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -34,7 +35,7 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import {useEffect, useState} from 'react';
 import Avatar from '@/app/(main)/(pages)/account/_components/avatar';
 import {useProfileContext} from '@/providers/profile-provider';
@@ -15,9 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {login} from '@/app/login/_actions/login-action';
-import {ToastAction} from '@/components/ui/toast';
-import * as React from 'react';
 import {Input} from '@/components/ui/input';
 
 const formSchema = z.object({

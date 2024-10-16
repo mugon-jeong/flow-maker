@@ -17,7 +17,7 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import CircleProgress from '@/components/global/circle-progress';
-import NodeItem from '@/app/(main)/(pages)/workflows/editor/_components/node-item';
+import NodeItem from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/node-item';
 import {useEditor} from '@/providers/editor-provider';
 
 type Props = {};
