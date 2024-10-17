@@ -1,23 +1,21 @@
 import React, {CSSProperties} from 'react';
-import {Handle, HandleProps} from '@xyflow/react';
-import {useEditor} from '@/providers/editor-provider';
+import {Handle, HandleProps, useEdges, useNodes} from '@xyflow/react';
 
 type Props = HandleProps & {style?: CSSProperties};
 
 const CustomHandle = (props: Props) => {
-  const {state} = useEditor();
+  const edges = useEdges();
+  const nodes = useNodes();
   return (
     <Handle
       {...props}
       isValidConnection={e => {
-        const sourcesFromHandleInState = state.editor.edges.filter(
+        const sourcesFromHandleInState = edges.filter(
           edge => edge.source === e.source,
         ).length;
-        const sourceNode = state.editor.elements.find(
-          node => node.id === e.source,
-        );
+        const sourceNode = nodes.find(node => node.id === e.source);
         //target
-        const targetFromHandleInState = state.editor.edges.filter(
+        const targetFromHandleInState = edges.filter(
           edge => edge.target === e.target,
         ).length;
 

@@ -37,6 +37,7 @@ const initialEditorState: EditorState['editor'] = {
     id: '',
     position: {x: 0, y: 0},
     type: 'Trigger',
+    selected: false,
   },
   edges: [],
 };
