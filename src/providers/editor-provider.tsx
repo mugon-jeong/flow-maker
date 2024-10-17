@@ -33,6 +33,7 @@ const initialEditorState: EditorState['editor'] = {
       title: '',
       type: 'Trigger',
       status: 'pending',
+      icon: 'workflow',
     },
     id: '',
     position: {x: 0, y: 0},

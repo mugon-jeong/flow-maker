@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Card,
   CardContent,
@@ -16,7 +16,8 @@ import {Label} from '@/components/ui/label';
 import {Button} from '@/components/ui/button';
 import {useModal} from '@/providers/modal-provider';
 import DialogModal from '@/components/global/dialog-modal';
-import {Input} from '@/components/ui/input';
+import Icon, {DynamicIconTypes} from '@/components/global/icon';
+import IconPicker from '@/components/global/icon-picker';
 
 type Props = {
   id: string;
@@ -28,6 +29,7 @@ const FlowCard = ({id, data, selected}: Props) => {
   const [flowStatus, setFlowStatus] = useState<FlowStatusTypes>(data.status);
   const [isEditing, setIsEditing] = useState(false);
   const {updateNodeData, setNodes} = useReactFlow<FlowNodeType>();
+  const [searchIcon, setSearchIcon] = useState(data.icon || 'workflow');
   const onEditing = (value: string) => {
     if (data.status === value) {
       setIsEditing(false);
@@ -37,32 +39,27 @@ const FlowCard = ({id, data, selected}: Props) => {
     }
   };
 
+  const logo = useMemo(() => {
+    return <Icon name={searchIcon as DynamicIconTypes} />;
+  }, [searchIcon]);
+
   const handleIconModal = () => {
-    console.log('handleIconModal');
     setOpen(
-      <DialogModal title={'title'}>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
-            Name
-          </Label>
-          <Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="username" className="text-right">
-            Username
-          </Label>
-          <Input
-            id="username"
-            defaultValue="@peduarte"
-            className="col-span-3"
-          />
-        </div>
+      <DialogModal title={'Icon Picker'}>
+        <IconPicker onSubmit={onChangeIcon} />
       </DialogModal>,
     );
   };
 
+  const onChangeIcon = (value: DynamicIconTypes) => {
+    if (data.icon !== value) {
+      setIsEditing(true);
+      setSearchIcon(value);
+    }
+  };
+
   const onSubmit = () => {
-    updateNodeData(id, {status: flowStatus});
+    updateNodeData(id, {status: flowStatus, icon: searchIcon});
     setIsEditing(false);
   };
   return (
@@ -97,7 +94,7 @@ const FlowCard = ({id, data, selected}: Props) => {
         className="relative dark:border-muted-foreground/70 w-full h-full"
       >
         <CardHeader className="flex flex-row items-center gap-4">
-          <div onClick={handleIconModal}>logo</div>
+          <div onClick={handleIconModal}>{logo}</div>
           <div>
             <CardTitle className="text-md">{data.title}</CardTitle>
             <CardDescription>

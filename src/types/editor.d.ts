@@ -1,3 +1,6 @@
+import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import {DynamicIconTypes} from '@/components/global/icon';
+
 export const FLowStatus = ['completed', 'current', 'pending'] as const;
 export type FlowTypes = 'Start' | 'Condition' | 'Trigger' | 'Action' | 'End';
 export type FlowStatusTypes = (typeof FLowStatus)[number];
@@ -9,6 +12,7 @@ export type FlowCardType = {
   metadata: object;
   type: FlowTypes;
   status: FlowStatusTypes;
+  icon: DynamicIconTypes | null;
 };
 
 export type FlowNodeType = {

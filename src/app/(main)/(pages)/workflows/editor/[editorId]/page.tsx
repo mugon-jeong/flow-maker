@@ -87,6 +87,7 @@ const Page = ({}: Props) => {
           metadata: {},
           status: 'pending',
           type: type,
+          icon: 'workflow',
         },
       };
 
