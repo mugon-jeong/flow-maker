@@ -32,6 +32,7 @@ const initialEditorState: EditorState['editor'] = {
       metadata: {},
       title: '',
       type: 'Trigger',
+      status: 'pending',
     },
     id: '',
     position: {x: 0, y: 0},

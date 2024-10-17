@@ -23,12 +23,12 @@ import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_componen
 import EditorSidebar from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/editor-sidebar';
 import {useEditor} from '@/providers/editor-provider';
 import {usePathname} from 'next/navigation';
-import {FlowCardType, FlowNodeType} from '@/types/editor';
 import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 import FlowInstance from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-instance';
 import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
 import FlowDownloadButton from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-download-button';
+import {FlowNodeType, FlowTypes} from '@/types/editor';
 
 type Props = {};
 const initialNodes: FlowNodeType[] = [];
@@ -48,19 +48,22 @@ const Page = ({}: Props) => {
   }, []);
 
   const onConnect = useCallback(
-    (params: Edge | Connection) =>
-      // @ts-ignore
-      setEdges(eds => addEdge(params, eds)),
+    (params: Edge | Connection) => setEdges(eds => addEdge(params, eds)),
     [],
   );
 
   const onDrop = useCallback(
-    (event: any) => {
+    (event: {
+      preventDefault: () => void;
+      dataTransfer: {getData: (arg0: string) => string};
+      clientX: number;
+      clientY: number;
+    }) => {
       event.preventDefault();
 
-      const type: FlowCardType['type'] = event.dataTransfer.getData(
+      const type = event.dataTransfer.getData(
         'application/reactflow',
-      );
+      ) as FlowTypes;
 
       // check if the dropped element is valid
       if (typeof type === 'undefined' || !type) {
@@ -71,24 +74,25 @@ const Page = ({}: Props) => {
         x: event.clientX,
         y: event.clientY,
       });
-      const newNode = {
+      const newNode: FlowNodeType = {
         id: v4(),
         type: type,
-        position,
+        position: position,
+        selected: false,
         data: {
           title: type,
           description: EditorCanvasDefaultCardTypes[type].description,
           completed: false,
           current: false,
           metadata: {},
+          status: 'pending',
           type: type,
         },
       };
 
-      // @ts-ignore
       setNodes(nds => nds.concat(newNode));
     },
-    [screenToFlowPosition, state],
+    [screenToFlowPosition],
   );
 
   const onGetWorkFlow = async () => {
@@ -120,29 +124,16 @@ const Page = ({}: Props) => {
   );
 
   const handleClickCanvas = () => {
-    dispatch({
-      type: 'SELECTED_ELEMENT',
-      payload: {
-        element: {
-          data: {
-            completed: false,
-            current: false,
-            description: '',
-            metadata: {},
-            title: '',
-            type: 'Trigger',
-          },
-          id: '',
-          position: {x: 0, y: 0},
-          type: 'Trigger',
-        },
-      },
-    });
+    console.log('handleClickCanvas');
+    setNodes(nodes.map(node => ({...node, selected: false})));
   };
 
   useEffect(() => {
-    dispatch({type: 'LOAD_DATA', payload: {edges, elements: nodes}});
-  }, [nodes, edges]);
+    dispatch({
+      type: 'LOAD_DATA',
+      payload: {edges: edges, elements: nodes},
+    });
+  }, [edges, nodes]);
 
   return (
     <ResizablePanelGroup direction={'horizontal'}>
@@ -182,8 +173,8 @@ const Page = ({}: Props) => {
           <CircleProgress />
         ) : (
           <>
-            <FlowInstance edges={edges} nodes={nodes}>
-              <EditorSidebar nodes={nodes} />
+            <FlowInstance>
+              <EditorSidebar />
             </FlowInstance>
           </>
         )}

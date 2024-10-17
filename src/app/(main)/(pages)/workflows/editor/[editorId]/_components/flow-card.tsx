@@ -1,26 +1,42 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {clsx} from 'clsx';
-import {NodeResizer, Position, useNodeId} from '@xyflow/react';
-import {useEditor} from '@/providers/editor-provider';
-import {FlowCardType} from '@/types/editor';
+import {NodeResizer, Position, useReactFlow} from '@xyflow/react';
+import {FlowCardType, FlowNodeType, FlowStatusTypes} from '@/types/editor';
 import CustomHandle from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/custom-handle';
+import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
+import {Label} from '@/components/ui/label';
+import {Button} from '@/components/ui/button';
 
 type Props = {
+  id: string;
   data: FlowCardType;
-  selected: boolean;
+  selected?: boolean | undefined;
 };
-const FlowCard = ({data, selected}: Props) => {
-  const {dispatch, state} = useEditor();
-  const nodeId = useNodeId();
-  console.log('FlowCard', nodeId);
-  console.log('selected', selected);
+const FlowCard = ({id, data, selected}: Props) => {
+  const [flowStatus, setFlowStatus] = useState<FlowStatusTypes>(data.status);
+  const [isEditing, setIsEditing] = useState(false);
+  const {updateNodeData, setNodes} = useReactFlow<FlowNodeType>();
+  const onEditing = (value: string) => {
+    if (data.status === value) {
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+      setFlowStatus(value as FlowStatusTypes);
+    }
+  };
+
+  const onSubmit = () => {
+    updateNodeData(id, {status: flowStatus});
+    setIsEditing(false);
+  };
   return (
     <>
       <NodeResizer
@@ -38,33 +54,35 @@ const FlowCard = ({data, selected}: Props) => {
       )}
       <Card
         onClick={e => {
-          e.stopPropagation();
-          const val = state.editor.elements.find(n => n.id === nodeId);
-          if (val)
-            dispatch({
-              type: 'SELECTED_ELEMENT',
-              payload: {
-                element: val,
-              },
+          setNodes(nodes => {
+            return nodes.map(n => {
+              if (n.id === id) {
+                return {
+                  ...n,
+                  selected: true,
+                };
+              }
+              return {...n, selected: false};
             });
+          });
         }}
         className="relative dark:border-muted-foreground/70 w-full h-full"
       >
         <CardHeader className="flex flex-row items-center gap-4">
           <div>logo</div>
           <div>
-            <CardTitle className="text-md">data.title</CardTitle>
+            <CardTitle className="text-md">{data.title}</CardTitle>
             <CardDescription>
               <p className="text-xs text-muted-foreground/50">
                 <b className="text-muted-foreground/80">ID: </b>
-                {nodeId}
+                {id}
               </p>
-              <p>data.description</p>
+              <p>{data.description}</p>
             </CardDescription>
           </div>
         </CardHeader>
         <Badge variant="secondary" className="absolute right-2 top-2">
-          data.type
+          {data.type}
         </Badge>
         <div
           className={clsx('absolute left-3 top-4 h-2 w-2 rounded-full', {
@@ -73,6 +91,27 @@ const FlowCard = ({data, selected}: Props) => {
             'bg-red-500': Math.random() >= 0.8,
           })}
         ></div>
+        <CardContent className={'flex flex-row justify-between'}>
+          <RadioGroup defaultValue={data.status} onValueChange={onEditing}>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="pending" id="pending" />
+              <Label htmlFor="pending">pending</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="current" id="current" />
+              <Label htmlFor="current">current</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="completed" id="completed" />
+              <Label htmlFor="completed">completed</Label>
+            </div>
+          </RadioGroup>
+          {isEditing && (
+            <div className={'flex flex-col justify-end'}>
+              <Button onClick={onSubmit}>Submit</Button>
+            </div>
+          )}
+        </CardContent>
       </Card>
       {data.type !== 'End' && (
         <CustomHandle type="source" position={Position.Bottom} id="a" />

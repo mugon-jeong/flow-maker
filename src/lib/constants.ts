@@ -1,5 +1,5 @@
 import {Home, Workflow} from 'lucide-react';
-import {FlowNodeType, FlowTypes} from '@/types/editor';
+import {FlowTypes} from '@/types/editor';
 
 export const menuOptions = [
   {name: 'Dashboard', Component: Home, href: '/dashboard'},

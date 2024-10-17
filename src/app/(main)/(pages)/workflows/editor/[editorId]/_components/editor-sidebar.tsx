@@ -11,11 +11,8 @@ import {
 } from '@/components/ui/card';
 import {onDragStart} from '@/lib/editor-utils';
 
-type Props = {
-  nodes: FlowNodeType[];
-};
-const EditorSidebar = ({nodes}: Props) => {
-  const {state} = useEditor();
+type Props = {};
+const EditorSidebar = ({}: Props) => {
   return (
     <aside>
       <div className={'h-screen overflow-scroll pb-24'}>

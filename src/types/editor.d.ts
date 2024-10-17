@@ -1,5 +1,6 @@
+export const FLowStatus = ['completed', 'current', 'pending'] as const;
 export type FlowTypes = 'Start' | 'Condition' | 'Trigger' | 'Action' | 'End';
-
+export type FlowStatusTypes = (typeof FLowStatus)[number];
 export type FlowCardType = {
   title: string;
   description: string;
@@ -7,11 +8,13 @@ export type FlowCardType = {
   current: boolean;
   metadata: object;
   type: FlowTypes;
+  status: FlowStatusTypes;
 };
 
 export type FlowNodeType = {
   id: string;
   type: FlowCardType['type'];
+  selected: boolean;
   position: {
     x: number;
     y: number;
@@ -44,4 +47,8 @@ export type EditorActions =
       payload: {
         element: FlowNodeType;
       };
+    }
+  | {
+      type: 'UPDATE_NODE_STATUS';
+      payload: {id: string; status: FlowStatusTypes};
     };
