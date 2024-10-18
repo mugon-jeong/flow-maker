@@ -22,3 +22,9 @@ export const getWorkflows = async (user: string) => {
     .eq('user_id', user);
   return data;
 };
+
+export const deleteWorkflow = async (id: string) => {
+  const supabase = supabaseServer();
+  const {status} = await supabase.from('workflows').delete().eq('id', id);
+  return status;
+};
