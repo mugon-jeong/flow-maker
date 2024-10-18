@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import {login} from '@/app/login/_actions/login-action';
+import {googleLogin, login} from '@/app/login/_actions/login-action';
 import {z} from 'zod';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -37,6 +37,10 @@ export default function LoginPage() {
       password: '',
     },
   });
+
+  const onGoogleLogin = () => {
+    googleLogin();
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const response = await login({...values});
@@ -84,6 +88,9 @@ export default function LoginPage() {
         />
         <div className={'flex flex-row justify-evenly'}>
           <Button type={'submit'}>Log in</Button>
+          <Button type={'button'} onClick={onGoogleLogin}>
+            Google Login
+          </Button>
           <Button type={'button'} onClick={() => router.push('/login/signup')}>
             Sign up
           </Button>

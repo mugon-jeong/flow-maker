@@ -1,6 +1,5 @@
 'use client';
 import * as React from 'react';
-import {login} from '@/app/login/_actions/login-action';
 import {signup} from '@/app/login/_actions/signup-action';
 import {z} from 'zod';
 import {useForm} from 'react-hook-form';
@@ -33,14 +32,15 @@ export default function SignupPage() {
       password: '',
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    signup(values);
+  };
   return (
     <Form {...form}>
-      <form>
+      <form
+        className={'flex flex-col gap-4'}
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         <FormField
           control={form.control}
           name={'email'}
@@ -67,9 +67,7 @@ export default function SignupPage() {
             </FormItem>
           )}
         />
-        <Button type={'submit'} formAction={signup}>
-          Sign up
-        </Button>
+        <Button type={'submit'}>Sign up</Button>
       </form>
     </Form>
   );
