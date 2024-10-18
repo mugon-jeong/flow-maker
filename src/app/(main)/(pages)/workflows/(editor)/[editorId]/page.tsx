@@ -19,15 +19,15 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import CircleProgress from '@/components/global/circle-progress';
-import FlowCard from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-card';
-import EditorSidebar from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/editor-sidebar';
+import FlowCard from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-card';
+import EditorSidebar from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/editor-sidebar';
 import {useEditor} from '@/providers/editor-provider';
 import {usePathname} from 'next/navigation';
 import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
-import FlowInstance from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-instance';
-import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
-import FlowDownloadButton from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/flow-download-button';
+import FlowInstance from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-instance';
+import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_actions/flow-action';
+import FlowDownloadButton from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-download-button';
 import {FlowNodeType, FlowTypes} from '@/types/editor';
 
 type Props = {};

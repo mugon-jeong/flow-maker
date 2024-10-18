@@ -10,7 +10,7 @@ import {Badge} from '@/components/ui/badge';
 import {clsx} from 'clsx';
 import {NodeResizer, Position, useReactFlow} from '@xyflow/react';
 import {FlowCardType, FlowNodeType, FlowStatusTypes} from '@/types/editor';
-import CustomHandle from '@/app/(main)/(pages)/workflows/editor/[editorId]/_components/custom-handle';
+import CustomHandle from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/custom-handle';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Label} from '@/components/ui/label';
 import {Button} from '@/components/ui/button';
@@ -93,29 +93,26 @@ const FlowCard = ({id, data, selected}: Props) => {
         }}
         className="relative dark:border-muted-foreground/70 w-full h-full"
       >
-        <CardHeader className="flex flex-row items-center gap-4">
+        <div
+          className={'flex flex-row justify-between items-center p-2 w-full'}
+        >
+          <p className="text-xs text-muted-foreground/50 pr-6">
+            <b className="text-muted-foreground/80">ID: </b>
+            {id}
+          </p>
+          <Badge variant="secondary" className="">
+            {data.type}
+          </Badge>
+        </div>
+        <CardHeader className="flex flex-row items-center pt-0 gap-4">
           <div onClick={handleIconModal}>{logo}</div>
           <div>
             <CardTitle className="text-md">{data.title}</CardTitle>
             <CardDescription>
-              <p className="text-xs text-muted-foreground/50">
-                <b className="text-muted-foreground/80">ID: </b>
-                {id}
-              </p>
               <p>{data.description}</p>
             </CardDescription>
           </div>
         </CardHeader>
-        <Badge variant="secondary" className="absolute right-2 top-2">
-          {data.type}
-        </Badge>
-        <div
-          className={clsx('absolute left-3 top-4 h-2 w-2 rounded-full', {
-            'bg-green-500': Math.random() < 0.6,
-            'bg-orange-500': Math.random() >= 0.6 && Math.random() < 0.8,
-            'bg-red-500': Math.random() >= 0.8,
-          })}
-        ></div>
         <CardContent className={'flex flex-row justify-between'}>
           <RadioGroup defaultValue={data.status} onValueChange={onEditing}>
             <div className="flex items-center space-x-2">

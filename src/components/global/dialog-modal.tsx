@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
 } from '@/components/ui/dialog';
 import {useModal} from '@/providers/modal-provider';
@@ -17,7 +18,7 @@ const DialogModal = ({title, description, children}: Props) => {
   const {isOpen, setClose} = useModal();
   const handleClose = () => setClose();
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose} modal>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

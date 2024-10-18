@@ -2,7 +2,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {usePathname} from 'next/navigation';
 import {Button} from '@/components/ui/button';
-import {onCreateNodesEdges} from '@/app/(main)/(pages)/workflows/editor/[editorId]/_actions/flow-action';
+import {onCreateNodesEdges} from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_actions/flow-action';
 import {useToast} from '@/hooks/use-toast';
 import {useReactFlow} from '@xyflow/react';
 
