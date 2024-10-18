@@ -8,12 +8,14 @@ import {
 import Link from 'next/link';
 import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
-import {Trash} from 'lucide-react';
+import {SquarePen, Trash} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {useToast} from '@/hooks/use-toast';
 import {deleteWorkflow} from '@/app/(main)/(pages)/workflows/_actions/workflow-action';
 import {useModal} from '@/providers/modal-provider';
 import AlertModal from '@/components/global/alert-modal';
+import DrawerModal from '@/components/global/drawer-modal';
+import WorkflowForm from '@/app/(main)/(pages)/workflows/_components/workflow-form';
 
 type Props = {
   id: string;
@@ -39,6 +41,19 @@ const WorkFlow = ({id, title, description, publish}: Props) => {
       });
     }
   };
+  const onUpdateFlow = () => {
+    setOpen(
+      <DrawerModal
+        title="Update WorkFlow"
+        subheading="Workflows are a powerfull that help you"
+      >
+        <WorkflowForm
+          id={id}
+          defaultValues={{title: title, description: description}}
+        />
+      </DrawerModal>,
+    );
+  };
   const handleRemove = () => {
     setOpen(<AlertModal title={'delete workflow'} onConfirm={onDeleteFlow} />);
   };
@@ -50,16 +65,28 @@ const WorkFlow = ({id, title, description, publish}: Props) => {
             <CardTitle className="text-lg">{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
           </div>
-          <Button
-            size={'icon'}
-            onClick={e => {
-              e.stopPropagation();
-              e.preventDefault();
-              handleRemove();
-            }}
-          >
-            <Trash />
-          </Button>
+          <div className={'flex flex-row gap-2'}>
+            <Button
+              size={'icon'}
+              onClick={e => {
+                e.stopPropagation();
+                e.preventDefault();
+                onUpdateFlow();
+              }}
+            >
+              <SquarePen />
+            </Button>
+            <Button
+              size={'icon'}
+              onClick={e => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleRemove();
+              }}
+            >
+              <Trash />
+            </Button>
+          </div>
         </CardHeader>
         <div className="flex flex-col items-end justify-center gap-2 p-4">
           <Label htmlFor="airplane-mode" className="text-muted-foreground">

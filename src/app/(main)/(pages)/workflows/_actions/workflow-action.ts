@@ -7,11 +7,19 @@ export const createWorkflow = async (data: TablesInsert<'workflows'>) => {
   const {
     data: {user},
   } = await supabase.auth.getUser();
-  const {error, status} = await supabase
+  const {error} = await supabase
     .from('workflows')
     .insert({...data, user_id: user?.id});
-  console.log('error', error);
-  return status;
+  return error;
+};
+
+export const updateWorkflow = async (
+  id: string,
+  data: TablesInsert<'workflows'>,
+) => {
+  const supabase = supabaseServer();
+  const {error} = await supabase.from('workflows').update(data).eq('id', id);
+  return error;
 };
 
 export const getWorkflows = async (user: string) => {

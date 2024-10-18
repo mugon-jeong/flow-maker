@@ -22,37 +22,52 @@ import {
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Loader2} from 'lucide-react';
-import {createWorkflow} from '@/app/(main)/(pages)/workflows/_actions/workflow-action';
+import {
+  createWorkflow,
+  updateWorkflow,
+} from '@/app/(main)/(pages)/workflows/_actions/workflow-action';
 import {useToast} from '@/hooks/use-toast';
 
 type Props = {
+  id?: string;
   title?: string;
   subTitle?: string;
+  defaultValues?: {
+    title: string;
+    description?: string | null;
+  };
 };
 
 const formSchema = z.object({
   title: z.string().min(1, {message: 'Title is required'}),
   description: z.string(),
 });
-const WorkflowForm = ({title, subTitle}: Props) => {
+const WorkflowForm = ({id, title, subTitle, defaultValues}: Props) => {
   const {setClose} = useModal();
   const {toast} = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      title: defaultValues?.title || '',
+      description: defaultValues?.description || '',
     },
   });
   const isLoading = form.formState.isLoading;
   const router = useRouter();
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const result = await createWorkflow({
-      title: values.title,
-      description: values.description,
-    });
-    if (result != 201) {
+    const result =
+      id == undefined
+        ? await createWorkflow({
+            title: values.title,
+            description: values.description,
+          })
+        : await updateWorkflow(id, {
+            title: values.title,
+            description: values.description,
+          });
+
+    if (result) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -66,12 +81,13 @@ const WorkflowForm = ({title, subTitle}: Props) => {
 
   return (
     <Card className="w-full max-w-[650px] border-none">
-      {title && subTitle && (
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{subTitle}</CardDescription>
-        </CardHeader>
-      )}
+      {title ||
+        (subTitle && (
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>{subTitle}</CardDescription>
+          </CardHeader>
+        ))}
       <CardContent>
         <Form {...form}>
           <form
