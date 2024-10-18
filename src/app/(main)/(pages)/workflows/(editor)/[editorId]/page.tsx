@@ -21,8 +21,6 @@ import {
 import CircleProgress from '@/components/global/circle-progress';
 import FlowCard from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-card';
 import EditorSidebar from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/editor-sidebar';
-import {useEditor} from '@/providers/editor-provider';
-import {usePathname} from 'next/navigation';
 import {v4} from 'uuid';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 import FlowInstance from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-instance';
@@ -30,14 +28,16 @@ import {onGetNodesEdges} from '@/app/(main)/(pages)/workflows/(editor)/[editorId
 import FlowDownloadButton from '@/app/(main)/(pages)/workflows/(editor)/[editorId]/_components/flow-download-button';
 import {FlowNodeType, FlowTypes} from '@/types/editor';
 
-type Props = {};
+type Props = {
+  searchParams: {
+    id: string;
+  };
+};
 const initialNodes: FlowNodeType[] = [];
 
 const initialEdges: {id: string; source: string; target: string}[] = [];
-const Page = ({}: Props) => {
+const Page = ({searchParams}: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
-  const {dispatch, state} = useEditor();
-  const pathname = usePathname();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const {screenToFlowPosition} = useReactFlow();
@@ -88,6 +88,8 @@ const Page = ({}: Props) => {
           status: 'pending',
           type: type,
           icon: 'workflow',
+          fileUrl: null,
+          fileName: null,
         },
       };
 
@@ -98,7 +100,7 @@ const Page = ({}: Props) => {
 
   const onGetWorkFlow = async () => {
     setIsLoading(true);
-    const {data, status} = await onGetNodesEdges(pathname.split('/').pop()!);
+    const {data, status} = await onGetNodesEdges(searchParams.id);
     if (status == 200 && data) {
       if (data[0].edges && data[0].nodes) {
         setEdges(JSON.parse(data[0].edges!));
@@ -128,13 +130,6 @@ const Page = ({}: Props) => {
     console.log('handleClickCanvas');
     setNodes(nodes.map(node => ({...node, selected: false})));
   };
-
-  useEffect(() => {
-    dispatch({
-      type: 'LOAD_DATA',
-      payload: {edges: edges, elements: nodes},
-    });
-  }, [edges, nodes]);
 
   return (
     <ResizablePanelGroup direction={'horizontal'}>

@@ -19,7 +19,7 @@ const WorkFlow = ({id, title, description, publish}: Props) => {
   const onPublishFlow = async (event: any) => {};
   return (
     <Card className="flex w-full items-center justify-between mb-2">
-      <Link className={'w-full'} href={`/workflows/${id}`}>
+      <Link className={'w-full'} href={`/workflows/${title}?id=${id}`}>
         <CardHeader className="flex flex-col gap-4">
           <div className="">
             <CardTitle className="text-lg">{title}</CardTitle>

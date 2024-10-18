@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
-import {FlowNodeType, FlowTypes} from '@/types/editor';
-import {useEditor} from '@/providers/editor-provider';
+import {FlowTypes} from '@/types/editor';
 import {EditorCanvasDefaultCardTypes} from '@/lib/constants';
 import {
   Card,

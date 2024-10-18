@@ -10,6 +10,7 @@ const CustomHandle = (props: Props) => {
     <Handle
       {...props}
       isValidConnection={e => {
+        console.log('e', e);
         const sourcesFromHandleInState = edges.filter(
           edge => edge.source === e.source,
         ).length;
