@@ -55,6 +55,7 @@ export default function LoginPage() {
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
+    router.refresh();
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

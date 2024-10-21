@@ -90,7 +90,7 @@ export const ProfileProvider = ({children}: ProfileProviderProps) => {
     const {data, error, status} = await supabase
       .from('profiles')
       .select(`full_name, username, website, avatar_url`)
-      .eq('id', user?.id)
+      .eq('id', user!.id)
       .single();
 
     if (error && status !== 406) {

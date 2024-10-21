@@ -7,10 +7,10 @@ import {
 } from '@xyflow/react';
 import {toPng} from 'html-to-image';
 import {Button} from '@/components/ui/button';
-function downloadImage(dataUrl) {
+function downloadImage(dataUrl: string) {
   const a = document.createElement('a');
 
-  a.setAttribute('download', 'reactflow.png');
+  a.setAttribute('download', 'flow-maker.png');
   a.setAttribute('href', dataUrl);
   a.click();
 }
