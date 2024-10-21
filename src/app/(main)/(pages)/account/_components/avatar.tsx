@@ -20,7 +20,11 @@ export default function Avatar({
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (url) downloadImage(url).then(image => setAvatarUrl(image));
+    if (url?.startsWith('https://')) {
+      setAvatarUrl(url);
+    } else if (url) {
+      downloadImage(url).then(image => setAvatarUrl(image));
+    }
   }, [url, supabase]);
 
   const uploadAvatar: React.ChangeEventHandler<
@@ -62,6 +66,7 @@ export default function Avatar({
           src={avatarUrl}
           alt="Avatar"
           className="avatar image"
+          priority={false}
           style={{height: size, width: size}}
         />
       ) : (

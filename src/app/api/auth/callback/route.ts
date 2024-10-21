@@ -3,6 +3,7 @@ import {supabaseServer} from '@/lib/supabase-server';
 // The client you created from the Server-Side Auth instructions
 
 export async function GET(request: Request) {
+  console.log('GET /api/auth/callback');
   const {searchParams, origin} = new URL(request.url);
   const code = searchParams.get('code');
   // if "next" is in param, use it as the redirect URL
@@ -15,16 +16,9 @@ export async function GET(request: Request) {
       const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === 'development';
       if (isLocalEnv) {
-        console.log('isLocalEnv', isLocalEnv);
-        console.log('forwardedHost', forwardedHost);
-        console.log('next', next);
-        console.log('origin', origin);
-
         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
         return NextResponse.redirect(`${origin}${next}`);
       } else if (forwardedHost) {
-        console.log('forwardedHost', forwardedHost);
-        console.log('next', next);
         return NextResponse.redirect(`https://${forwardedHost}${next}`);
       } else {
         return NextResponse.redirect(`${origin}${next}`);

@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import {googleLogin, login} from '@/app/login/_actions/login-action';
+import {login} from '@/app/login/_actions/login-action';
 import {z} from 'zod';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -17,6 +17,7 @@ import {Button} from '@/components/ui/button';
 import {useRouter} from 'next/navigation';
 import {useToast} from '@/hooks/use-toast';
 import {ToastAction} from '@/components/ui/toast';
+import {supabaseClient} from '@/lib/supabase-client';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -28,6 +29,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
+  const supabase = supabaseClient();
   const router = useRouter();
   const {toast} = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,8 +40,21 @@ export default function LoginPage() {
     },
   });
 
-  const onGoogleLogin = () => {
-    googleLogin();
+  const onGoogleLogin = async () => {
+    const {error} = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `http://localhost:3000/api/auth/callback`,
+      },
+    });
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid credentials',
+        description: `${error.message}`,
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    }
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

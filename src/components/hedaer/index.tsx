@@ -37,8 +37,9 @@ const HeaderBar = ({}: Props) => {
     .filter(value => value.length > 0)
     .map(value => value.concat()[0].toUpperCase() + value.slice(1));
   useEffect(() => {
-    if (avatar_url) {
-      console.log('avatar_url', avatar_url);
+    if (avatar_url?.startsWith('https://')) {
+      setAvatar(avatar_url);
+    } else if (avatar_url) {
       downloadImage(avatar_url).then(data => {
         setAvatar(data);
       });

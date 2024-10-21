@@ -33,22 +33,3 @@ export async function login({
   revalidatePath('/', 'layout');
   redirect('/dashboard');
 }
-
-export async function googleLogin() {
-  const origin = headers().get('origin');
-  const supabase = supabaseServer();
-  const {data, error} = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-        redirectTo: `${origin}/api/auth/callback`,
-      },
-    },
-  });
-  console.log('data', data);
-  if (data.url) {
-    redirect(data.url); // use the redirect API for your server framework
-  }
-}
